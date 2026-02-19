@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Aline AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { margin:0; font-family:sans-serif; background:#000; color:#fff; }
+    #assistant {
+      margin-top:20px; padding:20px; border-radius:12px;
+      background:rgba(255,255,255,0.1); backdrop-filter:blur(10px);
+      box-shadow:0 0 20px rgba(255,255,255,0.3);
+      text-align:center; font-size:16px;
+    }
+    #namePrompt {
+      position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(0,0,0,0.9); display:flex; flex-direction:column;
+      align-items:center; justify-content:center; color:#fff; z-index:10;
+    }
+    #namePrompt input, #namePrompt button, #inputBar {
+      margin:10px; padding:10px; font-size:16px; border-radius:8px; border:none;
+    }
+    #inputBar { width:80%; max-width:600px; }
+    #chatArea { margin:20px auto; max-width:800px; }
+    #suggestions button { margin:5px; padding:5px 10px; border:none; border-radius:6px; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <div id="namePrompt">
+    <h2>🤖 Hello! I am Aline AI. What’s your name?</h2>
+    <input type="text" id="userNameInput" placeholder="Enter your name">
+    <button onclick="setUserName()">Start</button>
+  </div>
+  <div id="chatArea">
+    <h2>Aline AI</h2>
+    <input type="text" id="inputBar" placeholder="Ask me anything...">
+    <button onclick="sendQuestion()">Ask</button>
+    <div id="assistant">I am ready to help!</div>
+    <div id="suggestions" style="margin-top:20px; text-align:center; color:#0ff;">
+      <!-- Aline AI will suggest questions here -->
+    </div>
+  </div>
+<script>
+let userName="";
+function setUserName(){
+  const input=document.getElementById("userNameInput").value.trim();
+  if(input){
+    userName=input;
+    document.getElementById("namePrompt").style.display="none";
+    document.getElementById("assistant").innerText="👋 Welcome, "+userName+"! Ask me anything.";
+  }
+}
+const responses = {
+  "hello": ()=>"Hello "+userName+"! Nice to meet you.",
+  "hi": ()=>"Hey "+userName+"! How’s your day?",
+  "good morning": ()=>"🌅 Good morning, "+userName+"!",
+  "good night": ()=>"🌙 Sleep well, "+userName+".",
+  "who are you": ()=>"I am Aline AI, your independent assistant.",
+  "what is your name": ()=>"My name is Aline AI.",
+  "how are you": ()=>"I’m feeling futuristic, "+userName+"!",
+  "thank you": ()=>"You’re welcome, "+userName+"!",
+  "goodbye": ()=>"👋 See you soon, "+userName+"!",
+  "define ai": ()=>"AI means Artificial Intelligence: machines that simulate human learning and reasoning.",
+  "define big data": ()=>"Big data refers to datasets so large and complex that traditional tools cannot handle them.",
+  "define blockchain": ()=>"Blockchain is a distributed ledger technology that records transactions securely.",
+  "define quantum computing": ()=>"Quantum computing uses quantum bits to perform calculations far faster than classical computers.",
+  "define machine learning": ()=>"Machine learning is a branch of AI where systems learn patterns from data.",
+  "define neural network": ()=>"Neural networks are algorithms inspired by the human brain’s structure.",
+  "define internet": ()=>"The internet is a global network connecting billions of devices.",
+  "define cloud computing": ()=>"Cloud computing delivers computing services over the internet.",
+  "fun fact 1": ()=>"🌍 The Amazon rainforest produces 20% of the world's oxygen.",
+  "fun fact 2": ()=>"🦑 The giant squid has the largest eyes in the animal kingdom.",
+  "fun fact 3": ()=>"🚀 The first human in space was Yuri Gagarin in 1961.",
+  "fun fact 4": ()=>"💡 Light from the Sun takes about 8 minutes to reach Earth.",
+  "fun fact 5": ()=>"🐝 Bees can recognize human faces.",
+  "joke 1": ()=>"😂 Why did the computer go to therapy? It had too many bytes of anxiety.",
+  "joke 2": ()=>"🤣 Why was the math book sad? Because it had too many problems.",
+  "quote 1": ()=>"💡 'The best way to predict the future is to invent it.' – Alan Kay",
+  "quote 2": ()=>"🌟 'Stay hungry, stay foolish.' – Steve Jobs",
+  "science fact 1": ()=>"🔬 Water is the only substance that naturally occurs in all three states: solid, liquid, and gas.",
+  "science fact 2": ()=>"⚡ Lightning is five times hotter than the surface of the Sun.",
+  "space fact 1": ()=>"🌌 There are more stars in the universe than grains of sand on Earth.",
+  "space fact 2": ()=>"🌕 The Moon is slowly drifting away from Earth, about 3.8 cm per year.",
+  "motivate me": ()=>"💡 Believe in your code, "+userName+"—it can change the world!"
+};
+function showSuggestions(list){
+  const sugDiv=document.getElementById("suggestions");
+  sugDiv.innerHTML="💡 You might also ask:<br>"+list.map(
+    s=>"<button onclick='handleInput(\""+s+"\")'>"+s+"</button>"
+  ).join(" ");
+}
+
+const suggestionMap = {
+  "hello": ["how are you","fun fact 1","joke 1"],
+  "define ai": ["define machine learning","define neural network","define quantum computing"],
+  "fun fact 1": ["fun fact 2","fun fact 3","science fact 1"],
+  "joke 1": ["joke 2","quote 1"],
+  "quote 1": ["quote 2","motivate me"],
+  "science fact 1": ["science fact 2","space fact 1"],
+  "space fact 1": ["space fact 2","fun fact 4"],
+  "motivate me": ["quote 2","fun fact 5"]
+};
+function smartFallback(question){
+  if(question.includes("science")){
+    return "🔬 I don’t have that exact science fact, but science is full of wonders—did you know water expands when it freezes?";
+  }
+  if(question.includes("history")){
+    return "📜 I don’t know that specific history detail, but history teaches us how civilizations rise and fall.";
+  }
+  if(question.includes("space")){
+    return "🌌 I don’t know that exact space fact, but space is infinite—scientists believe there may be trillions of galaxies.";
+  }
+  if(question.includes("technology")){
+    return "💻 I don’t know that exact tech fact, but technology evolves faster than ever—AI like me is part of that story.";
+  }
+  if(question.includes("literature")){
+    return "📚 I don’t know that exact literature fact, but books have shaped human culture for thousands of years.";
+  }
+  if(question.includes("geo")){
+    return "🌍 I don’t know that exact geography fact, but Earth has seven continents and over 190 countries.";
+  }
+  // Default creative fallback
+  return "🤔 I don’t know that yet, "+userName+", but I can suggest asking about fun facts, quotes, or science!";
+}
+function sendQuestion(){
+  const text=document.getElementById("inputBar").value.trim().toLowerCase();
+  if(!text) return;
+  let reply="";
+  let suggestions=[];
+  for(const key in responses){
+    if(text.includes(key)){
+      reply=responses[key]();
+      if(suggestionMap[key]) suggestions=suggestionMap[key];
+      break;
+    }
+  }
+  if(reply===""){
+    // Use smart fallback if no known response
+    reply=smartFallback(text);
+    suggestions=["fun fact 1","joke 1","quote 1"];
+  }
+  document.getElementById("assistant").innerText=reply;
+  if(suggestions.length>0) showSuggestions(suggestions);
+}
+</script>
+</body>
+</html>
