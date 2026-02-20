@@ -27,7 +27,7 @@
 </head>
 <body>
   <div id="namePrompt">
-    <h2>🤖 Hello! I am Aline AI. What’s your name?</h2>
+    <h2>🤖 Hello! I am Aline AI. What's your name?</h2>
     <input type="text" id="userNameInput" placeholder="Enter your name">
     <button onclick="setUserName()">Start</button>
   </div>
@@ -52,20 +52,20 @@ function setUserName(){
 }
 const responses = {
   "hello": ()=>"Hello "+userName+"! Nice to meet you.",
-  "hi": ()=>"Hey "+userName+"! How’s your day?",
+  "hi": ()=>"Hey "+userName+"! How's your day?",
   "good morning": ()=>"🌅 Good morning, "+userName+"!",
   "good night": ()=>"🌙 Sleep well, "+userName+".",
   "who are you": ()=>"I am Aline AI, your independent assistant.",
   "what is your name": ()=>"My name is Aline AI.",
-  "how are you": ()=>"I’m feeling futuristic, "+userName+"!",
-  "thank you": ()=>"You’re welcome, "+userName+"!",
+  "how are you": ()=>"I'm feeling futuristic, "+userName+"!",
+  "thank you": ()=>"You're welcome, "+userName+"!",
   "goodbye": ()=>"👋 See you soon, "+userName+"!",
   "define ai": ()=>"AI means Artificial Intelligence: machines that simulate human learning and reasoning.",
   "define big data": ()=>"Big data refers to datasets so large and complex that traditional tools cannot handle them.",
   "define blockchain": ()=>"Blockchain is a distributed ledger technology that records transactions securely.",
   "define quantum computing": ()=>"Quantum computing uses quantum bits to perform calculations far faster than classical computers.",
   "define machine learning": ()=>"Machine learning is a branch of AI where systems learn patterns from data.",
-  "define neural network": ()=>"Neural networks are algorithms inspired by the human brain’s structure.",
+  "define neural network": ()=>"Neural networks are algorithms inspired by the human brain's structure.",
   "define internet": ()=>"The internet is a global network connecting billions of devices.",
   "define cloud computing": ()=>"Cloud computing delivers computing services over the internet.",
   "fun fact 1": ()=>"🌍 The Amazon rainforest produces 20% of the world's oxygen.",
@@ -102,25 +102,25 @@ const suggestionMap = {
 };
 function smartFallback(question){
   if(question.includes("science")){
-    return "🔬 I don’t have that exact science fact, but science is full of wonders—did you know water expands when it freezes?";
+    return "🔬 I don't have that exact science fact, but science is full of wonders—did you know water expands when it freezes?";
   }
   if(question.includes("history")){
-    return "📜 I don’t know that specific history detail, but history teaches us how civilizations rise and fall.";
+    return "📜 I don't know that specific history detail, but history teaches us how civilizations rise and fall.";
   }
   if(question.includes("space")){
-    return "🌌 I don’t know that exact space fact, but space is infinite—scientists believe there may be trillions of galaxies.";
+    return "🌌 I don't know that exact space fact, but space is infinite—scientists believe there may be trillions of galaxies.";
   }
   if(question.includes("technology")){
-    return "💻 I don’t know that exact tech fact, but technology evolves faster than ever—AI like me is part of that story.";
+    return "💻 I don't know that exact tech fact, but technology evolves faster than ever—AI like me is part of that story.";
   }
   if(question.includes("literature")){
-    return "📚 I don’t know that exact literature fact, but books have shaped human culture for thousands of years.";
+    return "📚 I don't know that exact literature fact, but books have shaped human culture for thousands of years.";
   }
   if(question.includes("geo")){
-    return "🌍 I don’t know that exact geography fact, but Earth has seven continents and over 190 countries.";
+    return "🌍 I don't know that exact geography fact, but Earth has seven continents and over 190 countries.";
   }
   // Default creative fallback
-  return "🤔 I don’t know that yet, "+userName+", but I can suggest asking about fun facts, quotes, or science!";
+  return "🤔 I don't know that yet, "+userName+", but I can suggest asking about fun facts, quotes, or science!";
 }
 function sendQuestion(){
   const text=document.getElementById("inputBar").value.trim().toLowerCase();
@@ -134,14 +134,276 @@ function sendQuestion(){
       break;
     }
   }
-  if(reply===""){
-    // Use smart fallback if no known response
+  if(reply===""){  // Use smart fallback if no known response
     reply=smartFallback(text);
-    suggestions=["fun fact 1","joke 1","quote 1"];
+    suggestions=["fun fact 1","joke 1","quote 1"];  
   }
   document.getElementById("assistant").innerText=reply;
   if(suggestions.length>0) showSuggestions(suggestions);
 }
 </script>
 </body>
+<script>
+let userName="";
+
+function setUserName(){
+  const input=document.getElementById("userNameInput").value.trim();
+  if(input){
+    userName=input;
+    document.getElementById("namePrompt").style.display="none";
+    document.getElementById("assistant").innerText="👋 Welcome, "+userName+"! Ask me anything.";
+  }
+}
+
+// Fun extras (kept from your original design)
+const funResponses = {
+  "fun fact": ()=>"🐝 Bees can recognize human faces.",
+  "joke": ()=>"😂 Why did the computer go to therapy? It had too many bytes of anxiety.",
+  "quote": ()=>"💡 'The best way to predict the future is to invent it.' – Alan Kay",
+  "motivate": ()=>"🌟 Believe in yourself, "+userName+"—your ideas matter!"
+};
+
+// Bing Search API call (replace with your own key)
+async function getAnswer(question){
+  try {
+    const response = await fetch(
+      "https://api.bing.microsoft.com/v7.0/search?q=" + encodeURIComponent(question),
+      {
+        headers: { "Ocp-Apim-Subscription-Key": "YOUR_API_KEY_HERE" }
+      }
+    );
+    const data = await response.json();
+
+    if(data.webPages && data.webPages.value.length > 0){
+      return data.webPages.value[0].snippet;
+    } else {
+      return smartFallback(question);
+    }
+  } catch(err){
+    return "⚠️ Sorry "+userName+", there was an error fetching the answer.";
+  }
+}
+
+// Creative fallback if search doesn't return
+function smartFallback(question){
+  if(question.includes("fun fact")) return funResponses["fun fact"]();
+  if(question.includes("joke")) return funResponses["joke"]();
+  if(question.includes("quote")) return funResponses["quote"]();
+  if(question.includes("motivate")) return funResponses["motivate"]();
+  return "🤔 I don't know that yet, "+userName+", but you can ask me for a fun fact, joke, or quote!";
+}
+
+async function sendQuestion(){
+  const text=document.getElementById("inputBar").value.trim().toLowerCase();
+  if(!text) return;
+
+  document.getElementById("assistant").innerText="⏳ Thinking...";
+  
+  // If user asks for fun extras, skip search
+  let reply="";
+  for(const key in funResponses){
+    if(text.includes(key)){ 
+      reply=funResponses[key]();
+      break;
+    }
+  }
+
+  if(reply===""){ 
+    reply=await getAnswer(text);
+  }
+
+  document.getElementById("assistant").innerText=reply;
+}
+</script>
+<script>
+let userName="";
+
+function setUserName(){
+  const input=document.getElementById("userNameInput").value.trim();
+  if(input){
+    userName=input;
+    document.getElementById("namePrompt").style.display="none";
+    document.getElementById("assistant").innerText="👋 Welcome, "+userName+"! Ask me anything.";
+  }
+}
+
+// Fun extras
+const funResponses = {
+  "fun fact": ()=>"🐝 Bees can recognize human faces.",
+  "joke": ()=>"😂 Why did the computer go to therapy? It had too many bytes of anxiety.",
+  "quote": ()=>"💡 'The best way to predict the future is to invent it.' – Alan Kay",
+  "motivate": ()=>"🌟 Believe in yourself, "+userName+"—your ideas matter!"
+};
+
+// Bing Search API call (replace with your own key)
+async function getAnswer(question){
+  try {
+    const response = await fetch(
+      "https://api.bing.microsoft.com/v7.0/search?q=" + encodeURIComponent(question),
+      {
+        headers: { "Ocp-Apim-Subscription-Key": "YOUR_API_KEY_HERE" }
+      }
+    );
+    const data = await response.json();
+
+    if(data.webPages && data.webPages.value.length > 0){
+      return data.webPages.value[0].snippet;
+    } else {
+      return smartFallback(question);
+    }
+  } catch(err){
+    return "⚠️ Sorry "+userName+", there was an error fetching the answer.";
+  }
+}
+
+// Creative fallback
+function smartFallback(question){
+  if(question.includes("fun fact")) return funResponses["fun fact"]();
+  if(question.includes("joke")) return funResponses["joke"]();
+  if(question.includes("quote")) return funResponses["quote"]();
+  if(question.includes("motivate")) return funResponses["motivate"]();
+  return "🤔 I don't know that yet, "+userName+", but you can ask me for a fun fact, joke, or quote!";
+}
+
+// Suggestions logic
+function showSuggestions(list){
+  const sugDiv=document.getElementById("suggestions");
+  sugDiv.innerHTML="💡 You might also ask:<br>"+list.map(
+    s=>"<button onclick='handleSuggestion(\""+s+"\")'>"+s+"</button>"
+  ).join(" ");
+}
+
+function handleSuggestion(text){
+  document.getElementById("inputBar").value=text;
+  sendQuestion();
+}
+
+function getSuggestions(question){
+  if(question.includes("science")) return ["fun fact","space fact","quote"];
+  if(question.includes("space")) return ["fun fact","science fact","motivate"];
+  if(question.includes("history")) return ["quote","fun fact","joke"];
+  if(question.includes("technology")) return ["fun fact","quote","motivate"];
+  return ["fun fact","joke","quote"];
+}
+
+async function sendQuestion(){
+  const text=document.getElementById("inputBar").value.trim().toLowerCase();
+  if(!text) return;
+
+  document.getElementById("assistant").innerText="⏳ Thinking...";
+  
+  let reply="";
+  for(const key in funResponses){
+    if(text.includes(key)){  
+      reply=funResponses[key]();
+      break;
+    }
+  }
+
+  if(reply===""){ 
+    reply=await getAnswer(text);
+  }
+
+  document.getElementById("assistant").innerText=reply;
+  showSuggestions(getSuggestions(text));
+}
+</script>
+<script>
+let userName="";
+let conversationHistory=[]; // store last few questions
+
+function setUserName(){
+  const input=document.getElementById("userNameInput").value.trim();
+  if(input){
+    userName=input;
+    document.getElementById("namePrompt").style.display="none";
+    document.getElementById("assistant").innerText="👋 Welcome, "+userName+"! Ask me anything.";
+  }
+}
+
+// Fun extras
+const funResponses = {
+  "fun fact": ()=>"🐝 Bees can recognize human faces.",
+  "joke": ()=>"😂 Why did the computer go to therapy? It had too many bytes of anxiety.",
+  "quote": ()=>"💡 'The best way to predict the future is to invent it.' – Alan Kay",
+  "motivate": ()=>"🌟 Believe in yourself, "+userName+"—your ideas matter!"
+};
+
+// Bing Search API call (replace with your own key)
+async function getAnswer(question){
+  try {
+    const response = await fetch(
+      "https://api.bing.microsoft.com/v7.0/search?q=" + encodeURIComponent(question),
+      {
+        headers: { "Ocp-Apim-Subscription-Key": "YOUR_API_KEY_HERE" }
+      }
+    );
+    const data = await response.json();
+
+    if(data.webPages && data.webPages.value.length > 0){
+      return data.webPages.value[0].snippet;
+    } else {
+      return smartFallback(question);
+    }
+  } catch(err){
+    return "⚠️ Sorry "+userName+", there was an error fetching the answer.";
+  }
+}
+
+// Creative fallback
+function smartFallback(question){
+  if(question.includes("fun fact")) return funResponses["fun fact"]();
+  if(question.includes("joke")) return funResponses["joke"]();
+  if(question.includes("quote")) return funResponses["quote"]();
+  if(question.includes("motivate")) return funResponses["motivate"]();
+  return "🤔 I don't know that yet, "+userName+", but you can ask me for a fun fact, joke, or quote!";
+}
+
+// Suggestions logic
+function showSuggestions(list){
+  const sugDiv=document.getElementById("suggestions");
+  sugDiv.innerHTML="💡 You might also ask:<br>"+list.map(
+    s=>"<button onclick='handleSuggestion(\""+s+"\")'>"+s+"</button>"
+  ).join(" ");
+}
+
+function handleSuggestion(text){
+  document.getElementById("inputBar").value=text;
+  sendQuestion();
+}
+
+function getSuggestions(question){
+  if(question.includes("science")) return ["fun fact","space fact","quote"];
+  if(question.includes("space")) return ["fun fact","science fact","motivate"];
+  if(question.includes("history")) return ["quote","fun fact","joke"]; 
+  if(question.includes("technology")) return ["fun fact","quote","motivate"];  
+  return ["fun fact","joke","quote"]; 
+}
+
+async function sendQuestion(){
+  const text=document.getElementById("inputBar").value.trim().toLowerCase();
+  if(!text) return;
+
+  document.getElementById("assistant").innerText="⏳ Thinking...";
+  
+  let reply="";
+  for(const key in funResponses){
+    if(text.includes(key)){ 
+      reply=funResponses[key]();
+      break;
+    }
+  }
+
+  if(reply===""){ 
+    reply=await getAnswer(text);
+  }
+
+  // Save to conversation history (limit to last 5)
+  conversationHistory.push(text);
+  if(conversationHistory.length>5) conversationHistory.shift();
+
+  document.getElementById("assistant").innerText=reply;
+  showSuggestions(getSuggestions(text));
+}
+</script>
 </html>
